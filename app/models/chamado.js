@@ -2,18 +2,17 @@ const Sequelize = require('sequelize');
 const db = require('./conexao.js');
 
 class Chamado {
-  #titulo;
+  #protocolo;
   #descricao;
   #status;
-  #prioridade;
 
   constructor() {}
 
-  get titulo() {
-    return this.#titulo;
+  get protocolo() {
+    return this.#protocolo;
   }
-  set titulo(tit) {
-    this.#titulo = tit;
+  set protocolo(valor) {
+    this.#protocolo = valor;
   }
 
   get descricao() {
@@ -28,13 +27,6 @@ class Chamado {
   }
   set status(stat) {
     this.#status = stat;
-  }
-
-  get prioridade() {
-    return this.#prioridade;
-  }
-  set prioridade(prio) {
-    this.#prioridade = prio;
   }
 
   // Busca todos os chamados de uma categoria
@@ -56,14 +48,14 @@ class Chamado {
 
   // Busca um chamado específico
   static findOne(id_categoria, id_chamado) {
-    return ChamadoModel.findOne({ where: { id: id_chamado, id_categoria: id_categoria } });
+    return ChamadoModel.findOne({ where: { id: id_chamado, id_categoria } });
   }
 
-  // Exclui um chamado
+  // Exclui um chamado específico
   static async delete(id_chamado, id_categoria) {
     try {
       const chamado = await ChamadoModel.findOne({
-        where: { id: id_chamado, id_categoria: id_categoria },
+        where: { id: id_chamado, id_categoria },
       });
 
       if (chamado) {
@@ -86,39 +78,22 @@ const ChamadoModel = db.define('chamado', {
     allowNull: false,
     primaryKey: true,
   },
-
-  // FK para Categoria
   id_categoria: {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
-
-  // FK para Usuario (quem abriu)
-  id_usuario: {
-    type: Sequelize.INTEGER,
+  protocolo: {
+    type: Sequelize.STRING(50),
     allowNull: false,
+    unique: true,
   },
-
-  titulo: {
-    type: Sequelize.STRING(100),
-    allowNull: false,
-  },
-
   descricao: {
     type: Sequelize.TEXT,
     allowNull: true,
   },
-
   status: {
     type: Sequelize.STRING(50),
-    allowNull: false,
-    defaultValue: 'aberto',
-  },
-
-  prioridade: {
-    type: Sequelize.STRING(20),
-    allowNull: false,
-    defaultValue: 'média',
+    allowNull: true,
   },
 });
 

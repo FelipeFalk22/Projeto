@@ -1,4 +1,4 @@
-const models = require('../models');
+const models = require('../models/index.js');
 const Usuario = models.usuario.Usuario;
 
 const Ajv = require('ajv');
@@ -33,10 +33,8 @@ class UsuarioController {
 
     Usuario.create(usuario)
       .then((data) => {
-        // Remove a senha da resposta
         data.setDataValue('senha', '');
 
-        // Gera token com ID REAL
         const token = helper.gerarTokenAcesso(data.nome, data.id);
         data.setDataValue('token', token);
 
@@ -59,10 +57,13 @@ class UsuarioController {
 
     const dados = {
       email: request.body.email,
-      senha: helper.hashSenha(request.body.senha), // Hash igual ao do create
+      senha: helper.hashSenha(request.body.senha),
     };
 
-    Usuario.findOne({ email: dados.email, senha: dados.senha })
+    // CORRIGIDO AQUI
+    Usuario.findOne({
+      where: { email: dados.email, senha: dados.senha }
+    })
       .then((registro) => {
         if (!registro) {
           return response.status(404).json({
@@ -70,12 +71,9 @@ class UsuarioController {
           });
         }
 
-        // Gera token JWT
         const token = helper.gerarTokenAcesso(registro.nome, registro.id);
 
-        return response.status(200).json({
-          token: token,
-        });
+        return response.status(200).json({ token });
       })
       .catch((erro) => {
         return response.status(500).json({ message: erro.message });
