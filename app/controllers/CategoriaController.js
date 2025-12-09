@@ -1,142 +1,94 @@
-// validação de schema
-const Ajv = require('ajv');
-const ajv = new Ajv();
-
-const schema = require('../schemas/categoria/novaCategoria.js');
-const validacao = ajv.compile(schema);
-
-// models
 const models = require('../models');
-const CategoriaModel = models.categoria.CategoriaModel;
-const ChamadoModel = models.chamado.ChamadoModel;
+const Categoria = models.categoria;
 
 class CategoriaController {
-  
-  // Listar todas as categorias
-  findAll(request, response) {
-    CategoriaModel.findAll({
-      include: [{ model: ChamadoModel, as: 'chamados' }],
-    })
-      .then((data) => {
-        if (data && data.length > 0) {
-          return response.status(200).json(data);
-        } else {
-          return response.status(404).json({
-            message: 'Nenhuma categoria encontrada',
-          });
-        }
-      })
-      .catch((erro) => {
-        response.status(500).json({
-          message: erro.message,
-        });
-      });
-  }
 
-  // Buscar categoria por ID
-  find(request, response) {
-    const id = request.params.id;
+  // CRIAR
+  async create(req, res) {
+    const dados = {
+      nome: req.body.nome,
+      descricao: req.body.descricao
+    };
 
-    CategoriaModel.findByPk(id, {
-      include: [{ model: ChamadoModel, as: 'chamados' }],
-    })
-      .then((data) => {
-        if (data) {
-          return response.status(200).json(data);
-        } else {
-          return response.status(404).json({
-            message: 'Categoria não encontrada',
-          });
-        }
-      })
-      .catch((erro) => {
-        return response.status(500).json({
-          message: erro.message,
-        });
-      });
-  }
-
-  // Criar nova categoria
-  create(request, response) {
-    let validacoes = validacao(request.body);
-
-    if (!validacoes) {
-      let mensagem = validacao.errors[0].instancePath.replace('/', '');
-      mensagem += ' ' + validacao.errors[0].message;
-      return response.status(400).json({
-        message: mensagem,
-      });
+    try {
+      const categoria = await Categoria.create(dados);
+      return res.status(201).json(categoria);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
     }
-
-    CategoriaModel.create(request.body)
-      .then((data) => {
-        return response.status(201).json(data);
-      })
-      .catch((erro) => {
-        return response.status(500).json({
-          message: 'Erro no servidor: ' + erro.message,
-        });
-      });
   }
 
-  // Atualizar categoria
-  update(request, response) {
-    const id = request.params.id;
-
-    CategoriaModel.findByPk(id)
-      .then((buscaCategoria) => {
-        if (buscaCategoria === null) {
-          return response.status(404).json({
-            message: 'Categoria não encontrada',
-          });
-        } else {
-          CategoriaModel.update(request.body, { where: { id } })
-            .then((resultado) => {
-              if (resultado[0] > 0) {
-                CategoriaModel.findByPk(id).then((categoriaAtualizada) => {
-                  return response.status(200).json(categoriaAtualizada);
-                });
-              } else {
-                return response.status(500).json({
-                  message: 'Ocorreu algum problema no servidor',
-                });
-              }
-            })
-            .catch((erro) => {
-              return response.status(500).json({
-                message: erro.message,
-              });
-            });
+  // LISTAR TODAS
+  async findAll(req, res) {
+    try {
+      const categorias = await Categoria.findAll({
+        include: {                 // 🔥 funcionando com sua relation
+          model: models.chamado,
+          as: 'chamados'
         }
-      })
-      .catch((erro) => {
-        return response.status(500).json({
-          message: erro.message,
-        });
       });
+      return res.status(200).json(categorias);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
   }
 
-  // Excluir categoria
-  delete(request, response) {
-    const id = request.params.id;
-
-    CategoriaModel.destroy({ where: { id } })
-      .then((removido) => {
-        if (removido) {
-          return response.status(200).json({
-            message: 'Categoria excluída com sucesso',
-          });
-        } else {
-          return response.status(404).json({
-            message: 'Categoria não encontrada',
-          });
+  // BUSCAR POR ID
+  async find(req, res) {
+    const id = req.params.id;
+    try {
+      const categoria = await Categoria.findByPk(id, {
+        include: {
+          model: models.chamado,
+          as: 'chamados'
         }
-      })
-      .catch((erro) => {
-        response.status(500).json({
-          message: erro.message,
-        });
       });
+
+      if (!categoria) {
+        return res.status(404).json({ message: 'Categoria não encontrada.' });
+      }
+
+      return res.status(200).json(categoria);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
+
+  // ATUALIZAR
+  async update(req, res) {
+    const id = req.params.id;
+    const dados = req.body;
+
+    try {
+      const categoria = await Categoria.findByPk(id);
+      if (!categoria) {
+        return res.status(404).json({ message: 'Categoria não encontrada.' });
+      }
+
+      await categoria.update(dados);
+      return res.status(200).json(categoria);
+
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
+
+  // EXCLUIR
+  async delete(req, res) {
+    const id = req.params.id;
+
+    try {
+      const categoria = await Categoria.findByPk(id);
+      if (!categoria) {
+        return res.status(404).json({ message: 'Categoria não encontrada.' });
+      }
+
+      await categoria.destroy(); // 🔥 CASCADE funciona por causa da relação
+      return res.status(200).json({ message: 'Categoria removida.' });
+
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
   }
 }
 

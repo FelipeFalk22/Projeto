@@ -1,78 +1,34 @@
 const Sequelize = require('sequelize');
 const db = require('./conexao.js');
 
-class Usuario {
-  #nome;
-  #email;
-  #senha;
-
-  constructor() {}
-
-  get nome() {
-    return this.#nome;
-  }
-  set nome(nome) {
-    this.#nome = nome;
-  }
-
-  get email() {
-    return this.#email;
-  }
-  set email(email) {
-    this.#email = email;
-  }
-
-  get senha() {
-    return this.#senha;
-  }
-  set senha(senha) {
-    this.#senha = senha;
-  }
-
-  // Cria um novo usuário no banco
-  static async create(novoUsuario) {
-    try {
-      const usuario = await UsuarioModel.create({
-        nome: novoUsuario.nome,
-        email: novoUsuario.email,
-        senha: novoUsuario.senha, // já deve vir criptografada do controller
-      });
-      return usuario;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  // Busca um usuário (email ou id)
-  static async findOne(dados) {
-    try {
-      const resultado = await UsuarioModel.findOne({ where: dados });
-      if (resultado) {
-        return resultado;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-}
-
-// Modelo Sequelize (estrutura da tabela)
-const UsuarioModel = db.define('usuario', {
-  nome: {
-    type: Sequelize.STRING(200),
-    allowNull: false,
+const Usuario = db.define('usuario', {
+  id: { 
+    type: Sequelize.INTEGER, 
+    primaryKey: true, 
+    autoIncrement: true 
   },
-  email: {
-    type: Sequelize.STRING(80),
-    allowNull: false,
-    unique: true,
+  nome: { 
+    type: Sequelize.STRING(200), 
+    allowNull: false 
   },
-  senha: {
-    type: Sequelize.STRING(255), // corrigido para suportar hash bcrypt
-    allowNull: false,
+  email: { 
+    type: Sequelize.STRING(80), 
+    allowNull: false, 
+    unique: true 
   },
+  senha: { 
+    type: Sequelize.STRING(64), 
+    allowNull: false 
+  },
+  tipo: { 
+    type: Sequelize.STRING(20), 
+    allowNull: false, 
+    defaultValue: 'user' 
+  }
+}, {
+  tableName: 'usuario',
+  timestamps: true,
+  underscored: true
 });
 
-module.exports = { Usuario, UsuarioModel };
+module.exports = Usuario;

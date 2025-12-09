@@ -34,7 +34,7 @@ const options = {
             id: { type: 'integer', example: 1 },
             nome: { type: 'string', example: 'Felipe Barcelos' },
             email: { type: 'string', example: 'felipe@ifsc.edu.br' },
-            senha: { type: 'string', example: '$2b$10$abc123...' },
+            tipo: { type: 'string', example: 'user' },
           },
         },
 
@@ -45,6 +45,7 @@ const options = {
             nome: { type: 'string', example: 'Felipe Barcelos' },
             email: { type: 'string', example: 'felipe@ifsc.edu.br' },
             senha: { type: 'string', example: '123456' },
+            tipo: { type: 'string', example: 'admin' },
           },
         },
 
@@ -85,7 +86,7 @@ const options = {
           type: 'object',
           properties: {
             id: { type: 'integer', example: 1 },
-            protocolo: { type: 'string', example: 'CHAM-001' },
+            protocolo: { type: 'string', example: 'CHAM-20250201-182038' },
             descricao: { type: 'string', example: 'Computador não liga' },
             status: { type: 'string', example: 'aberto' },
             id_categoria: { type: 'integer', example: 2 },
@@ -93,16 +94,16 @@ const options = {
           },
         },
 
+        // ✔ NovoChamado ARRUMADO para coincidir com seu controller
         NovoChamado: {
           type: 'object',
-          required: ['protocolo', 'descricao', 'status'],
+          required: ['descricao'],
           properties: {
-            protocolo: { type: 'string', example: 'CHAM-002' },
             descricao: { type: 'string', example: 'Erro ao abrir sistema interno' },
-            status: { type: 'string', example: 'em andamento' },
-            id_usuario: { type: 'integer', example: 1 },
+            status: { type: 'string', example: 'aberto' },
           },
         },
+
       },
     },
     security: [

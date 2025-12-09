@@ -1,42 +1,35 @@
 module.exports = (models) => {
-  const { CategoriaModel, ChamadoModel, UsuarioModel } = models;
+  const UsuarioModel = models.usuario;
+  const CategoriaModel = models.categoria;
+  const ChamadoModel = models.chamado;
 
-  if (!CategoriaModel || !ChamadoModel || !UsuarioModel) {
-    console.warn('⚠️ Models não carregados corretamente em relations.js');
-    return;
-  }
+  // -------------------------------
+  // Categoria 1 -> N Chamados
+  // -------------------------------
+  CategoriaModel.hasMany(ChamadoModel, {
+    foreignKey: 'id_categoria',
+    as: 'chamados',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  });
 
-  // --- RELACIONAMENTO: Categoria 1 -> N Chamados ---
-  if (!CategoriaModel.associations.chamados) {
-    CategoriaModel.hasMany(ChamadoModel, {
-      foreignKey: 'id_categoria',
-      as: 'chamados',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    });
-  }
+  ChamadoModel.belongsTo(CategoriaModel, {
+    foreignKey: 'id_categoria',
+    as: 'categoria'
+  });
 
-  if (!ChamadoModel.associations.categoria) {
-    ChamadoModel.belongsTo(CategoriaModel, {
-      foreignKey: 'id_categoria',
-      as: 'categoria',
-    });
-  }
+  // -------------------------------
+  // Usuario 1 -> N Chamados
+  // -------------------------------
+  UsuarioModel.hasMany(ChamadoModel, {
+    foreignKey: 'id_usuario',
+    as: 'chamados_usuario',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  });
 
-  // --- RELACIONAMENTO: Usuário 1 -> N Chamados ---
-  if (!UsuarioModel.associations.chamados) {
-    UsuarioModel.hasMany(ChamadoModel, {
-      foreignKey: 'id_usuario',
-      as: 'chamados',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-    });
-  }
-
-  if (!ChamadoModel.associations.usuario) {
-    ChamadoModel.belongsTo(UsuarioModel, {
-      foreignKey: 'id_usuario',
-      as: 'usuario',
-    });
-  }
+  ChamadoModel.belongsTo(UsuarioModel, {
+    foreignKey: 'id_usuario',
+    as: 'usuario'
+  });
 };

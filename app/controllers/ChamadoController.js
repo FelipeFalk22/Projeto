@@ -1,101 +1,108 @@
+// controllers/ChamadoController.js
+
 const models = require('../models');
-const { ChamadoModel: Chamado } = require('../models/Chamado.js');
-
-const Ajv = require('ajv');
-const ajv = new Ajv();
-
-const schema = require('../schemas/chamado/novoChamado.js');
-const validacao = ajv.compile(schema);
+const Chamado = models.chamado; 
 
 class ChamadoController {
-  
-  // Listar chamados de uma categoria
-  findByCategoria(request, response) {
-    const id_categoria = request.params.id_categoria;
 
-    Chamado.findAll({ where: { id_categoria } })
-      .then((chamados) => {
-        if (chamados && chamados.length > 0) {
-          return response.status(200).json(chamados);
-        }
-        return response.status(404).json({
-          message: 'Nenhum chamado encontrado para esta categoria',
-        });
-      })
-      .catch((error) => {
-        return response.status(500).json({ message: error.message });
-      });
+  // Listar todos os chamados
+  findAll(req, res) {
+    Chamado.findAll()
+      .then(data => res.status(200).json(data))
+      .catch(err => res.status(500).json({ message: err.message }));
   }
 
-  // Criar chamado vinculado a uma categoria
-  create(request, response) {
-    let validacoes = validacao(request.body);
+  // Buscar um chamado pelo ID
+  async findOne(req, res) {
+    const { id_chamado } = req.params;
 
-    if (!validacoes) {
-      let mensagem = validacao.errors[0].instancePath.replace('/', '');
-      mensagem += ' ' + validacao.errors[0].message;
-      return response.status(400).json({ message: mensagem });
+    try {
+      const chamado = await Chamado.findOne({ where: { id: id_chamado } });
+
+      if (!chamado) {
+        return res.status(404).json({ message: 'Chamado não encontrado.' });
+      }
+
+      return res.status(200).json(chamado);
+
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
     }
+  }
 
-    const chamadoParaCriar = {
-      ...request.body,
-      id_categoria: request.params.id_categoria,
-      id_usuario: request.body.id_usuario, // usuário que abriu
-    };
+  // Listar chamados de uma categoria
+  async findByCategoria(req, res) {
+    const { id_categoria } = req.params;
+    try {
+      const chamados = await Chamado.findAll({ where: { id_categoria } });
+      if (!chamados || chamados.length === 0) {
+        return res.status(404).json({ message: 'Nenhum chamado encontrado.' });
+      }
+      return res.status(200).json(chamados);
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
 
-    Chamado.create(chamadoParaCriar)
-      .then((novoChamado) => response.status(201).json(novoChamado))
-      .catch((erro) =>
-        response.status(500).json({
-          message: 'erro no servidor: ' + erro.message,
-        })
-      );
+  // Criar chamado dentro da categoria
+  async create(req, res) {
+    const { id_categoria } = req.params;
+    const dados = req.body;
+
+    try {
+      // ID do usuário autenticado
+      const id_usuario = req.usuario.id;
+
+      // GERAR PROTOCOLO AUTOMATICAMENTE
+      const protocolo = 'CHAM-' + Date.now();
+
+      const chamado = await Chamado.create({
+        ...dados,
+        id_categoria,
+        id_usuario,
+        protocolo
+      });
+
+      return res.status(201).json(chamado);
+
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
   }
 
   // Atualizar chamado
-  update(request, response) {
-    const { id_categoria, id_chamado } = request.params;
+  async update(req, res) {
+    const { id_categoria, id_chamado } = req.params;
+    const dados = req.body;
 
-    Chamado.update(request.body, { where: { id: id_chamado, id_categoria } })
-      .then((resultado) => {
-        if (resultado[0] > 0) {
-          Chamado.findOne({
-            where: { id: id_chamado, id_categoria },
-          }).then((data) => {
-            response.status(200).json(data);
-          });
-        } else {
-          response.status(404).json({
-            message: `Chamado com id=${id_chamado} não encontrado ou sem alterações.`,
-          });
-        }
-      })
-      .catch((err) =>
-        response.status(500).json({
-          message: 'Erro ao atualizar o chamado: ' + err.message,
-        })
-      );
+    try {
+      const chamado = await Chamado.findOne({ where: { id: id_chamado, id_categoria } });
+      if (!chamado)
+        return res.status(404).json({ message: 'Chamado não encontrado.' });
+
+      await chamado.update(dados);
+      return res.status(200).json(chamado);
+
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
   }
 
   // Excluir chamado
-  delete(request, response) {
-    const { id_chamado, id_categoria } = request.params;
+  async delete(req, res) {
+    const { id_categoria, id_chamado } = req.params;
 
-    Chamado.destroy({ where: { id: id_chamado, id_categoria } })
-      .then((removido) => {
-        if (removido) {
-          return response.status(200).json({
-            message: 'Chamado excluído com sucesso',
-          });
-        } else {
-          return response.status(404).json({
-            message: 'Chamado não encontrado',
-          });
-        }
-      })
-      .catch((erro) => {
-        response.status(500).json({ message: erro.message });
-      });
+    try {
+      const chamado = await Chamado.findOne({ where: { id: id_chamado, id_categoria } });
+      if (!chamado)
+        return res.status(404).json({ message: 'Chamado não encontrado.' });
+
+      await chamado.destroy();
+      return res.status(200).json({ message: 'Chamado removido com sucesso.' });
+
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
   }
 }
 

@@ -5,8 +5,8 @@ const Sequelize = require('sequelize');
 // Criação da conexão com o banco de dados MySQL
 const conexao = new Sequelize(
   dbconfig.database,
-  dbconfig.user,
-  dbconfig.passwd,
+  dbconfig.username,   // ✔ corrigido
+  dbconfig.password,   // ✔ corrigido
   {
     host: dbconfig.host,
     dialect: dbconfig.dialect,
@@ -25,7 +25,6 @@ const conexao = new Sequelize(
     dialectOptions: {
       dateStrings: false,
       typeCast: function (field, next) {
-        // leitura de campos DATETIME
         if (field.type === 'DATETIME') {
           return field.string();
         }

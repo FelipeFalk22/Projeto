@@ -9,8 +9,8 @@ module.exports = {
   dbconfig: {
     host: process.env.DBHOST,
     database: process.env.DBNAME,
-    user: process.env.DBUSER,
-    passwd: process.env.DBPASS,
+    username: process.env.DBUSER,   // corrigido (user → username)
+    password: process.env.DBPASS,   // corrigido (passwd → password)
     dialect: process.env.DBDIALECT,
     pool: {
       max: 5,

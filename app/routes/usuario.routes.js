@@ -1,16 +1,33 @@
 const express = require('express');
-var router = express.Router();
+const router = express.Router();
+
 const usuarioController = require('../controllers/UsuarioController.js');
 
-// Rota de criação de usuário
+// ===============================
+// LISTAR USUÁRIOS (APENAS TESTE)
+// ===============================
+router.get('/usuario', usuarioController.listar);
+/**
+ * @swagger
+ * /usuario:
+ *   get:
+ *     summary: Lista usuários (apenas para teste)
+ *     tags: [Usuario]
+ *     responses:
+ *       200:
+ *         description: Lista de usuários retornada com sucesso
+ */
+
+// ===============================
+// CRIAR USUÁRIO
+// ===============================
 router.post('/usuario', usuarioController.create);
 /**
  * @swagger
  * /usuario:
  *   post:
- *     summary: Cria um usuário
- *     description: Registra um novo usuário no sistema de chamados de suporte e retorna um token JWT.
- *     tags: [usuario]
+ *     summary: Cria um novo usuário
+ *     tags: [Usuario]
  *     requestBody:
  *       required: true
  *       content:
@@ -18,24 +35,22 @@ router.post('/usuario', usuarioController.create);
  *           schema:
  *             $ref: '#/components/schemas/NovoUsuario'
  *     responses:
- *       '201':
- *         description: Usuário criado com sucesso.
- *       '400':
- *         description: Dados inválidos.
- *       '500':
- *         description: Erro interno no servidor.
+ *       201:
+ *         description: Usuário criado com sucesso
+ *       400:
+ *         description: Dados inválidos
  */
 
-// Rota de login
+// ===============================
+// LOGIN
+// ===============================
 router.post('/usuario/login', usuarioController.login);
 /**
  * @swagger
  * /usuario/login:
  *   post:
  *     summary: Login de usuário
- *     description: Autentica o usuário e retorna um token JWT para acessar as rotas protegidas.
- *     tags: [usuario]
- *     security: []  # rota pública (sem token)
+ *     tags: [Usuario]
  *     requestBody:
  *       required: true
  *       content:
@@ -43,14 +58,10 @@ router.post('/usuario/login', usuarioController.login);
  *           schema:
  *             $ref: '#/components/schemas/LoginUsuario'
  *     responses:
- *       '200':
- *         description: Login realizado com sucesso.
- *       '400':
- *         description: Dados inválidos.
- *       '404':
- *         description: Usuário ou senha incorretos.
- *       '500':
- *         description: Erro interno no servidor.
+ *       200:
+ *         description: Login realizado com sucesso
+ *       404:
+ *         description: Usuário ou senha incorretos
  */
 
 module.exports = router;

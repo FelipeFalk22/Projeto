@@ -2,9 +2,10 @@ module.exports = {
   type: 'object',
   properties: {
     nome: { type: 'string', minLength: 4 },
-    email: { type: 'string' },
-    senha: { type: 'string', minLength: 6 }
+    email: { type: 'string', format: 'email' },
+    senha: { type: 'string', minLength: 6 },
+    tipo: { type: 'string', enum: ['admin', 'user'] }
   },
-  required: ['email', 'senha', 'nome'],
+  required: ['nome', 'email', 'senha'],
   additionalProperties: false
 };

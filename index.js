@@ -1,23 +1,27 @@
 require('dotenv').config();
 const app = require('./app');
-const { sequelize } = require('./models');
+
+// Conexão verdadeira do Sequelize
+const conexao = require('./app/models/conexao.js');
 
 const port = process.env.PORT || 3000;
 
 async function start() {
   try {
-    // Testa conexão com o banco
-    await sequelize.authenticate();
+    // Testa a conexão
+    await conexao.authenticate();
+    console.log('Conectado ao banco de dados');
 
-    // Sincroniza modelos (tabelas)
-    await sequelize.sync();
+    // Sincroniza as tabelas (sempre simples)
+    await conexao.sync();
 
-    app.listen(port, () =>
-      console.log(`Servidor rodando na porta ${port}`)
-    );
+    // Inicia o servidor
+    app.listen(port, () => {
+      console.log(`Servidor rodando na porta ${port}`);
+    });
 
-  } catch (err) {
-    console.error('Erro ao iniciar aplicação:', err);
+  } catch (error) {
+    console.error('Erro ao iniciar servidor:', error);
     process.exit(1);
   }
 }

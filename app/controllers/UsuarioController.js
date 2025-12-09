@@ -1,5 +1,5 @@
 const models = require('../models/index.js');
-const Usuario = models.usuario.Usuario;
+const Usuario = models.usuario;
 
 const Ajv = require('ajv');
 const addFormats = require('ajv-formats');
@@ -15,68 +15,87 @@ const schemaLogin = require('../schemas/usuario/login.js');
 const validacaoLogin = ajv.compile(schemaLogin);
 
 class UsuarioController {
-  // Criação de um novo usuário
-  create(request, response) {
-    const validacoes = validacao(request.body);
-    if (!validacoes) {
+
+  // Criar usuário
+  create(req, res) {
+    const valido = validacao(req.body);
+
+    if (!valido) {
       const erro = validacao.errors[0];
       const campo = erro.instancePath.replace('/', '') || 'campo';
       const mensagem = `${campo} ${erro.message}`;
-      return response.status(400).json({ message: mensagem });
+      return res.status(400).json({ message: mensagem });
     }
 
     const usuario = {
-      nome: request.body.nome || null,
-      email: request.body.email,
-      senha: helper.hashSenha(request.body.senha),
+      nome: req.body.nome,
+      email: req.body.email,
+      senha: helper.hashSenha(req.body.senha),
+      tipo: req.body.tipo || 'user'
     };
 
     Usuario.create(usuario)
       .then((data) => {
+        // remove senha do retorno
         data.setDataValue('senha', '');
 
-        const token = helper.gerarTokenAcesso(data.nome, data.id);
+        // gera token
+        const token = helper.gerarTokenAcesso(data.nome, data.id, data.tipo);
         data.setDataValue('token', token);
 
-        return response.status(201).json(data);
+        return res.status(201).json(data);
       })
       .catch((erro) => {
-        return response.status(500).json({ message: erro.message });
+        return res.status(500).json({ message: erro.message });
       });
   }
 
-  // Login do usuário
-  login(request, response) {
-    const validacoes = validacaoLogin(request.body);
-    if (!validacoes) {
+  // Listar usuários
+  listar(req, res) {
+    Usuario.findAll({
+      attributes: ['id', 'nome', 'email', 'tipo'] // sem senha
+    })
+      .then((usuarios) => {
+        return res.status(200).json(usuarios);
+      })
+      .catch((erro) => {
+        return res.status(500).json({ message: erro.message });
+      });
+  }
+
+  // Login
+  login(req, res) {
+    const valido = validacaoLogin(req.body);
+
+    if (!valido) {
       const erro = validacaoLogin.errors[0];
       const campo = erro.instancePath.replace('/', '') || 'campo';
       const mensagem = `${campo} ${erro.message}`;
-      return response.status(400).json({ message: mensagem });
+      return res.status(400).json({ message: mensagem });
     }
 
     const dados = {
-      email: request.body.email,
-      senha: helper.hashSenha(request.body.senha),
+      email: req.body.email,
+      senha: helper.hashSenha(req.body.senha)
     };
 
-    // CORRIGIDO AQUI
     Usuario.findOne({
       where: { email: dados.email, senha: dados.senha }
     })
       .then((registro) => {
         if (!registro) {
-          return response.status(404).json({
-            message: 'Usuário ou senha não encontrados.',
+          return res.status(404).json({
+            message: 'Usuário ou senha não encontrados.'
           });
         }
 
-        const token = helper.gerarTokenAcesso(registro.nome, registro.id);
+        // gerar token
+        const token = helper.gerarTokenAcesso(registro.nome, registro.id, registro.tipo);
 
-        return response.status(200).json({ token });
+        return res.status(200).json({ token });
       })
       .catch((erro) => {
-        return response.status(500).json({ message: erro.message });
+        return res.status(500).json({ message: erro.message });
       });
   }
 }

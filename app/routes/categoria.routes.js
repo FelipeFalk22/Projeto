@@ -1,28 +1,36 @@
 const express = require('express');
-var router = express.Router();
+const router = express.Router();
 
 const categoriaController = require('../controllers/CategoriaController.js');
 const authMiddleware = require('../middlewares/TokenValido.js');
+const admin = require('../middlewares/Admin.js');
 
 // ===============================
-// CATEGORIAS
+// ROTAS DE CATEGORIAS
 // ===============================
 
-// Lista todas as categorias
-router.get('/', [authMiddleware.check], categoriaController.findAll);
+// LISTAR TODAS
+router.get(
+  '/',
+  authMiddleware.check,
+  categoriaController.findAll
+);
 /**
  * @swagger
  * /categorias:
  *   get:
  *     summary: Lista todas as categorias
- *     description: Retorna todas as categorias de chamados.
  *     tags: [Categoria]
  *     security:
  *       - bearerAuth: []
  */
 
-// Recupera uma categoria pelo ID
-router.get('/:id', [authMiddleware.check], categoriaController.find);
+// BUSCAR POR ID
+router.get(
+  '/:id',
+  authMiddleware.check,
+  categoriaController.find
+);
 /**
  * @swagger
  * /categorias/{id}:
@@ -31,39 +39,55 @@ router.get('/:id', [authMiddleware.check], categoriaController.find);
  *     tags: [Categoria]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
  */
 
-// Cria nova categoria
-router.post('/', [authMiddleware.check], categoriaController.create);
+// CRIAR (ADMIN)
+router.post(
+  '/',
+  [authMiddleware.check, admin],
+  categoriaController.create
+);
 /**
  * @swagger
  * /categorias:
  *   post:
- *     summary: Cria uma nova categoria de chamado
+ *     summary: Cria uma nova categoria (ADMIN)
  *     tags: [Categoria]
  *     security:
  *       - bearerAuth: []
  */
 
-// Atualiza categoria
-router.put('/:id', [authMiddleware.check], categoriaController.update);
+// ATUALIZAR (ADMIN)
+router.put(
+  '/:id',
+  [authMiddleware.check, admin],
+  categoriaController.update
+);
 /**
  * @swagger
  * /categorias/{id}:
  *   put:
- *     summary: Atualiza uma categoria
+ *     summary: Atualiza uma categoria (ADMIN)
  *     tags: [Categoria]
  *     security:
  *       - bearerAuth: []
  */
 
-// Exclui categoria
-router.delete('/:id', [authMiddleware.check], categoriaController.delete);
+// EXCLUIR (ADMIN)
+router.delete(
+  '/:id',
+  [authMiddleware.check, admin],
+  categoriaController.delete
+);
 /**
  * @swagger
  * /categorias/{id}:
  *   delete:
- *     summary: Exclui uma categoria
+ *     summary: Exclui uma categoria (ADMIN)
  *     tags: [Categoria]
  *     security:
  *       - bearerAuth: []

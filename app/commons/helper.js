@@ -2,18 +2,17 @@ const config = require('../../config.js');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
-// ⚠️ SOMENTE PARA TESTES NO POSTMAN (remover depois)
-console.log('🔐 Chave JWT carregada no middleware:', config.jwt.secret);
-
+// Hash SHA-256 simples (mantém compatibilidade)
 exports.hashSenha = (senha) => {
   const hash = crypto.createHash('sha256');
   hash.update(senha);
   return hash.digest('hex');
 };
 
-exports.gerarTokenAcesso = (nome, id) => {
+// Gerar token JWT
+exports.gerarTokenAcesso = (nome, id, tipo) => {
   return jwt.sign(
-    { nome, id },
+    { nome, id, tipo },
     config.jwt.secret,
     { expiresIn: config.jwt.expiration }
   );

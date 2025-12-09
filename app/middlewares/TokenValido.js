@@ -12,14 +12,15 @@ class TokenValido {
       });
     }
 
-    // Formato inválido (precisa ser Bearer token)
-    if (!cabecalhoAuth.startsWith('Bearer')) {
+    // Formato inválido
+    if (!cabecalhoAuth.toLowerCase().startsWith('bearer')) {
       return response.status(401).json({
         message: 'Formato inválido. Utilize: Bearer [token].',
       });
     }
 
-    const token = cabecalhoAuth.split(' ')[1];
+    // Extrair token (aceita múltiplos espaços)
+    const token = cabecalhoAuth.split(/\s+/)[1];
 
     // Token vazio
     if (!token) {
@@ -28,7 +29,7 @@ class TokenValido {
       });
     }
 
-    // Validação JWT
+    // Verificar token
     jwt.verify(token, config.jwt.secret, (erro, usuarioData) => {
       if (erro) {
         return response.status(403).json({
@@ -36,8 +37,8 @@ class TokenValido {
         });
       }
 
-      // Token ok → segue para a rota
-      request.usuario = usuarioData;
+      // Token válido → salvar dados do usuário e seguir
+      request.usuario = usuarioData; // usado pelos controllers (tipo, id, nome)
       next();
     });
   }

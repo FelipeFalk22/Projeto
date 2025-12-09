@@ -1,31 +1,28 @@
 const conexao = require('./conexao.js');
-const categoria = require('./Categoria.js');
-const chamado = require('./Chamado.js');
-const usuario = require('./Usuario.js');
+
+// Cada arquivo retorna diretamente o Model Sequelize
+const Usuario = require('./Usuario.js');
+const Categoria = require('./Categoria.js');
+const Chamado = require('./Chamado.js');
+
+// Importa função de relações
 const relations = require('./relations.js');
 
 const db = {};
 
-// Importa e guarda os models
-db.categoria = categoria;
-db.chamado = chamado;
-db.usuario = usuario;
+// Registra os models dentro do objeto db
+db.usuario = Usuario;
+db.categoria = Categoria;
+db.chamado = Chamado;
 
-// Passa os Models Sequelize reais para relations.js
+// Passa os models para aplicar relacionamentos
 relations({
-  CategoriaModel: categoria.CategoriaModel,
-  ChamadoModel: chamado.ChamadoModel,
-  UsuarioModel: usuario.UsuarioModel,
+  usuario: Usuario,
+  categoria: Categoria,
+  chamado: Chamado
 });
 
-// Sincroniza banco
-conexao
-  .sync({})
-  .then(() => {
-    console.log('Sincronização com o banco de dados realizada com sucesso...');
-  })
-  .catch((err) => {
-    console.log('Falha ao sincronizar com o banco de dados: ' + err.message);
-  });
+// Caso queira sincronizar (deixado comentado para evitar recriação de tabelas)
+// conexao.sync({ alter: false });
 
 module.exports = db;
