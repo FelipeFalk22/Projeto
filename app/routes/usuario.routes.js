@@ -3,10 +3,11 @@ const router = express.Router();
 
 const usuarioController = require('../controllers/UsuarioController.js');
 
+
 // ===============================
 // LISTAR USUÁRIOS (APENAS TESTE)
 // ===============================
-router.get('/usuario', usuarioController.listar);
+router.get('/', usuarioController.listar);
 /**
  * @swagger
  * /usuario:
@@ -21,7 +22,7 @@ router.get('/usuario', usuarioController.listar);
 // ===============================
 // CRIAR USUÁRIO
 // ===============================
-router.post('/usuario', usuarioController.create);
+router.post('/', usuarioController.create);
 /**
  * @swagger
  * /usuario:
@@ -44,7 +45,7 @@ router.post('/usuario', usuarioController.create);
 // ===============================
 // LOGIN
 // ===============================
-router.post('/usuario/login', usuarioController.login);
+router.post('/login', usuarioController.login);
 /**
  * @swagger
  * /usuario/login:
