@@ -13,7 +13,7 @@ class TokenValido {
     }
 
     // Formato inválido
-    if (!cabecalhoAuth.toLowerCase().startsWith('bearer')) {
+  if (!/^bearer\s+/i.test(cabecalhoAuth)) {
       return response.status(401).json({
         message: 'Formato inválido. Utilize: Bearer [token].',
       });
