@@ -31,4 +31,4 @@ const Usuario = db.define('usuario', {
   underscored: true
 });
 
-module.exports = Usuario;
+module.exports = usuario;
