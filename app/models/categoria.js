@@ -17,8 +17,8 @@ const Categoria = db.define('categoria', {
   }
 }, {
   tableName: 'categoria',
-  timestamps: true,        // usa created_at e updated_at automaticamente
-  underscored: true        // garante compatibilidade com created_at
+  timestamps: true,  // usa created_at e updated_at automaticamente
+  underscored: true 
 });
 
 module.exports = Categoria;

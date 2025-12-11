@@ -98,6 +98,70 @@ class UsuarioController {
         return res.status(500).json({ message: erro.message });
       });
   }
+
+  
+// Atualizar usuário (apenas admin)
+atualizar(req, res) {
+  const { id } = req.params;
+
+  // Verifica se o usuário logado é admin
+  if (req.usuario.tipo !== 'admin') {
+    return res.status(403).json({ message: 'Acesso negado' });
+  }
+
+  const valido = validacao(req.body);
+  if (!valido) {
+    const erro = validacao.errors[0];
+    const campo = erro.instancePath.replace('/', '') || 'campo';
+    const mensagem = `${campo} ${erro.message}`;
+    return res.status(400).json({ message: mensagem });
+  }
+
+  Usuario.findByPk(id)
+    .then(usuario => {
+      if (!usuario) {
+        return res.status(404).json({ message: 'Usuário não encontrado' });
+      }
+
+      // Atualiza os dados
+      usuario.nome = req.body.nome;
+      usuario.email = req.body.email;
+      usuario.tipo = req.body.tipo;
+      if (req.body.senha) {
+        usuario.senha = helper.hashSenha(req.body.senha);
+      }
+
+      return usuario.save()
+        .then(() => res.status(200).json({ message: 'Usuário atualizado com sucesso' }));
+    })
+    .catch(erro => {
+      return res.status(500).json({ message: 'Erro ao atualizar usuário' });
+    });
+}
+
+  // Deletar usuário (apenas admin)
+  deletar(req, res) {
+    const { id } = req.params;
+
+    // Verifica se o usuário logado é admin
+    if (req.user.tipo !== 'admin') {
+      return res.status(403).json({ message: 'Acesso negado' });
+    }
+
+    Usuario.findByPk(id)
+      .then(usuario => {
+        if (!usuario) {
+          return res.status(404).json({ message: 'Usuário não encontrado' });
+        }
+
+        return usuario.destroy()
+          .then(() => res.status(200).json({ message: 'Usuário excluído com sucesso' }));
+      })
+      .catch(erro => {
+        return res.status(500).json({ message: 'Erro ao excluir usuário' });
+      });
+  }
+
 }
 
 module.exports = new UsuarioController();

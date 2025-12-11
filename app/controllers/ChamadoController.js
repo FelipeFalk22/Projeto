@@ -1,5 +1,3 @@
-// controllers/ChamadoController.js
-
 const models = require('../models');
 const Chamado = models.chamado; 
 
@@ -53,7 +51,7 @@ class ChamadoController {
       // ID do usuário autenticado
       const id_usuario = req.usuario.id;
 
-      // GERAR PROTOCOLO AUTOMATICAMENTE
+      // Gera protocolo automáticamente
       const protocolo = 'CHAM-' + Date.now();
 
       const chamado = await Chamado.create({

@@ -22,7 +22,4 @@ relations({
   chamado: Chamado
 });
 
-// Caso queira sincronizar (deixado comentado para evitar recriação de tabelas)
-// conexao.sync({ alter: false });
-
 module.exports = db;

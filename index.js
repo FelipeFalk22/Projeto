@@ -12,7 +12,7 @@ async function start() {
     await conexao.authenticate();
     console.log('Conectado ao banco de dados');
 
-    // Sincroniza as tabelas (sempre simples)
+    // Sincroniza as tabelas
     await conexao.sync();
 
     // Inicia o servidor

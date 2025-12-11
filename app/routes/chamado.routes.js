@@ -61,8 +61,7 @@ router.get(
 router.post(
   '/:id_categoria/chamados',
   authMiddleware.check,
-  chamadoController.create
-);
+  chamadoController.create);
 /**
  * @swagger
  * /{id_categoria}/chamados:

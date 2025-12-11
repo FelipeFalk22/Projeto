@@ -5,8 +5,8 @@ const Sequelize = require('sequelize');
 // Criação da conexão com o banco de dados MySQL
 const conexao = new Sequelize(
   dbconfig.database,
-  dbconfig.username,   // ✔ corrigido
-  dbconfig.password,   // ✔ corrigido
+  dbconfig.username,
+  dbconfig.password,
   {
     host: dbconfig.host,
     dialect: dbconfig.dialect,

@@ -12,14 +12,12 @@ class TokenValido {
       });
     }
 
-    // Formato inválido
   if (!/^bearer\s+/i.test(cabecalhoAuth)) {
       return response.status(401).json({
         message: 'Formato inválido. Utilize: Bearer [token].',
       });
     }
-
-    // Extrair token (aceita múltiplos espaços)
+// Token aceita múltiplos espaços
     const token = cabecalhoAuth.split(/\s+/)[1];
 
     // Token vazio

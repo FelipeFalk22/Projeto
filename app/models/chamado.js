@@ -38,7 +38,6 @@ const ChamadoModel = db.define('chamado', {
   underscored: true
 });
 
-// Classe com métodos (igual ao projeto antigo)
 class Chamado {
   static create(data) {
     return ChamadoModel.create(data);

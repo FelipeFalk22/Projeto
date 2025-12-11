@@ -26,8 +26,8 @@ const usuarioRotas = require('./app/routes/usuario.routes.js');
 // ORDEM CORRETA
 app.use('/usuario', usuarioRotas);
 app.use('/categorias', categoriaRotas);
-app.use('/chamados', chamadoRotas); // GET /chamados
-app.use('/', chamadoRotas);         // POST /1/chamados e GET /1/chamados
+app.use('/chamados', chamadoRotas); 
+app.use('/', chamadoRotas);
 
 
 module.exports = app;

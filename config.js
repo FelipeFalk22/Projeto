@@ -9,8 +9,8 @@ module.exports = {
   dbconfig: {
     host: process.env.DBHOST,
     database: process.env.DBNAME,
-    username: process.env.DBUSER,   // corrigido (user → username)
-    password: process.env.DBPASS,   // corrigido (passwd → password)
+    username: process.env.DBUSER,
+    password: process.env.DBPASS,
     dialect: process.env.DBDIALECT,
     pool: {
       max: 5,
@@ -22,7 +22,7 @@ module.exports = {
       underscored: true,       // createdAt → created_at
       freezeTableName: true,   // evita plural automático
       timestamps: true,        // cria created_at e updated_at
-      paranoid: false,         // soft delete desabilitado
+      paranoid: false,
     },
   },
 };

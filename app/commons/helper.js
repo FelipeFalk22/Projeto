@@ -2,7 +2,7 @@ const config = require('../../config.js');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 
-// Hash SHA-256 simples (mantém compatibilidade)
+// Hash SHA-256 simples
 exports.hashSenha = (senha) => {
   const hash = crypto.createHash('sha256');
   hash.update(senha);

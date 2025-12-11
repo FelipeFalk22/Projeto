@@ -22,7 +22,7 @@ class CategoriaController {
   async findAll(req, res) {
     try {
       const categorias = await Categoria.findAll({
-        include: {                 // 🔥 funcionando com sua relation
+        include: {
           model: models.chamado,
           as: 'chamados'
         }
@@ -83,7 +83,7 @@ class CategoriaController {
         return res.status(404).json({ message: 'Categoria não encontrada.' });
       }
 
-      await categoria.destroy(); // 🔥 CASCADE funciona por causa da relação
+      await categoria.destroy();
       return res.status(200).json({ message: 'Categoria removida.' });
 
     } catch (err) {

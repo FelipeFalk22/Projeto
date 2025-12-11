@@ -94,7 +94,7 @@ const options = {
           },
         },
 
-        // ✔ NovoChamado ARRUMADO para coincidir com seu controller
+        // ✔ NovoChamado
         NovoChamado: {
           type: 'object',
           required: ['descricao'],
