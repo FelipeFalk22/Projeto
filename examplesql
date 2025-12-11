@@ -1,0 +1,4 @@
+criar banco de dados mysql
+drop database if exists chamados_de_suporte;
+create database chamados_de_suporte;
+USE chamados_de_suporte;
