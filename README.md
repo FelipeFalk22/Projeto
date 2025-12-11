@@ -1,233 +1,177 @@
-# Sistema de Chamados - API RESTful
+# 🎫 Sistema de Chamados -- API RESTful (Node.js + Express + Sequelize)
 
-## Descrição
+API RESTful desenvolvida para gerenciamento completo de **usuários**,
+**chamados** e **categorias**, usando tecnologias modernas do
+ecossistema Node.js.\
+O projeto inclui autenticação com JWT, validação com Ajv, modelagem
+relacional no MySQL e documentação com Swagger.
 
-Este projeto implementa uma **API RESTful para gerenciamento de chamados de suporte**.
-Ela permite cadastrar **usuários**, **categorias** e **chamados**, e inclui autenticação via **JWT**. A documentação da API está disponível via **Swagger**.
+Este projeto foi desenvolvido na disciplina de **Desenvolvimento
+Back-End**, mas pode ser utilizado como modelo profissional para
+aplicações reais.
 
----
+------------------------------------------------------------------------
 
-## Tecnologias
+## 📌 Funcionalidades Principais
 
-* Node.js
-* Express
-* JWT para autenticação
-* Sequelize (ou outro ORM, se usado)
-* Swagger (Documentação da API)
+✔ Cadastro e login de usuários (hash com bcrypt)\
+✔ Abertura, edição e encerramento de chamados\
+✔ Classificação dos chamados por categorias\
+✔ Controle de acesso por token JWT\
+✔ Rotas protegidas\
+✔ Validação de dados com Ajv\
+✔ Banco relacional usando Sequelize (ORM)\
+✔ Documentação automática via Swagger\
+✔ Estrutura escalável para evolução do projeto
 
----
+------------------------------------------------------------------------
 
-## Estrutura do Projeto
+# 🚀 Tecnologias Utilizadas
 
-```
-/app
-  /routes       -> Rotas da API (usuários, categorias, chamados)
-  /controllers  -> Lógica de cada rota
-  /models       -> Models do banco de dados
-/config         -> Configurações (ex: banco de dados, JWT)
-schemas         -> Schemas de validação para requisições
-swagger.js      -> Configuração do Swagger
-server.js       -> Arquivo principal do servidor
-```
+-   **Node.js**
+-   **Express**
+-   **Sequelize (MySQL)**
+-   **MySQL**
+-   **bcrypt**
+-   **JWT**
+-   **Ajv**
+-   **Cors**
+-   **Swagger UI Express**
 
----
+------------------------------------------------------------------------
 
-## Instalação
+# 🗂️ Estrutura do Projeto
 
-1. Clone o repositório:
+    /app
+      /commons
+      /controllers
+      /middlewares
+      /models
+      /routes
+    /modelagem
+    app.js
+    config.js
+    package.json
 
-```bash
-git clone <URL_DO_REPOSITORIO>
-```
+------------------------------------------------------------------------
 
-2. Instale as dependências:
+# 🗄️ Modelagem do Banco de Dados
 
-```bash
-npm install
-```
+## 🔹 1. `usuario`
 
-3. Configure variáveis de ambiente no arquivo `.env` (exemplo):
+  Campo   Tipo                                    Descrição
+  ------- --------------------------------------- ----------------
+  id      INT PK AI                               Identificador
+  nome    VARCHAR                                 Nome completo
+  email   VARCHAR UNIQUE                          Usado no login
+  senha   VARCHAR                                 Hash da senha
+  tipo    ENUM('cliente', 'atendente', 'admin')   Permissões
 
-```
-PORT=3000
-JWT_SECRET=seu_token_secreto
-DATABASE_URL=sqlite://database.db
-```
+------------------------------------------------------------------------
 
-4. Inicie o servidor:
+## 🔹 2. `categoria`
 
-```bash
-npm start
-```
+  Campo       Tipo        Descrição
+  ----------- ----------- --------------------
+  id          INT PK AI   Identificador
+  nome        VARCHAR     Nome da categoria
+  descricao   TEXT        Descrição opcional
 
-O servidor estará rodando em `http://localhost:3000`.
+------------------------------------------------------------------------
 
----
+## 🔹 3. `chamado`
 
-## Rotas Principais
+  Campo          Tipo                                      Descrição
+  -------------- ----------------------------------------- ----------------------
+  id             INT PK AI                                 Identificador
+  titulo         VARCHAR                                   Título do chamado
+  descricao      TEXT                                      Detalhes do problema
+  status         ENUM('aberto','em_andamento','fechado')   Estado atual
+  prioridade     ENUM('baixa','media','alta')              Urgência
+  usuario_id     INT FK → usuario.id                       Quem abriu
+  categoria_id   INT FK → categoria.id                     Classificação
+  criado_em      DATETIME                                  Timestamp
 
-### Usuários
+------------------------------------------------------------------------
 
-* `POST /usuarios` → Cadastrar novo usuário
-  **Exemplo de request:**
+# 📘 Exemplo de Chamado
 
-```json
+``` json
 {
-  "nome": "Felipe Barcelos",
-  "email": "felipe@ifsc.edu.br",
-  "senha": "123456",
-  "tipo": "admin"
-}
-```
-
-**Exemplo de response:**
-
-```json
-{
-  "id": 1,
-  "nome": "Felipe Barcelos",
-  "email": "felipe@ifsc.edu.br",
-  "tipo": "admin"
-}
-```
-
-* `POST /usuarios/login` → Fazer login e receber token JWT
-  **Exemplo de request:**
-
-```json
-{
-  "email": "felipe@ifsc.edu.br",
-  "senha": "123456"
-}
-```
-
-**Exemplo de response:**
-
-```json
-{
-  "token": "seu_jwt_token_aqui"
-}
-```
-
-* `GET /usuarios` → Listar todos os usuários (precisa de autenticação)
-  **Exemplo de response:**
-
-```json
-[
-  {
-    "id": 1,
-    "nome": "Felipe Barcelos",
-    "email": "felipe@ifsc.edu.br",
-    "tipo": "admin"
-  }
-]
-```
-
-### Categorias
-
-* `POST /categorias` → Criar nova categoria
-  **Exemplo de request:**
-
-```json
-{
-  "nome": "Hardware",
-  "descricao": "Problemas em equipamentos físicos"
-}
-```
-
-**Exemplo de response:**
-
-```json
-{
-  "id": 1,
-  "nome": "Hardware",
-  "descricao": "Problemas em equipamentos físicos"
-}
-```
-
-* `GET /categorias` → Listar todas as categorias
-  **Exemplo de response:**
-
-```json
-[
-  {
-    "id": 1,
-    "nome": "Hardware",
-    "descricao": "Problemas em equipamentos físicos"
-  }
-]
-```
-
-### Chamados
-
-* `POST /chamados` → Criar novo chamado
-  **Exemplo de request:**
-
-```json
-{
-  "descricao": "Computador não liga",
+  "titulo": "Erro ao acessar a conta",
+  "descricao": "Tento fazer login no sistema e aparece a mensagem de erro, mesmo com os dados corretos.",
   "status": "aberto",
-  "id_categoria": 1,
-  "id_usuario": 1
+  "prioridade": "alta",
+  "usuario_id": 3,
+  "categoria_id": 1
 }
 ```
 
-**Exemplo de response:**
+------------------------------------------------------------------------
 
-```json
-{
-  "id": 1,
-  "protocolo": "CHAM-20251210-120000",
-  "descricao": "Computador não liga",
-  "status": "aberto",
-  "id_categoria": 1,
-  "id_usuario": 1
-}
-```
+# 🔐 Autenticação com JWT
 
-* `GET /chamados` → Listar todos os chamados
-  **Exemplo de response:**
+Fluxo:
 
-```json
-[
-  {
-    "id": 1,
-    "protocolo": "CHAM-20251210-120000",
-    "descricao": "Computador não liga",
-    "status": "aberto",
-    "id_categoria": 1,
-    "id_usuario": 1
-  }
-]
-```
+1.  Cadastro\
+2.  Login\
+3.  JWT\
+4.  Rotas protegidas
 
-* `GET /chamados/:id` → Detalhes de um chamado específico
-  **Exemplo de response:**
+Exemplo:
 
-```json
-{
-  "id": 1,
-  "protocolo": "CHAM-20251210-120000",
-  "descricao": "Computador não liga",
-  "status": "aberto",
-  "id_categoria": 1,
-  "id_usuario": 1
-}
-```
+    Authorization: Bearer seu_token_aqui
 
-> **Observação:** Todas as rotas que exigem autenticação devem incluir o token JWT no cabeçalho:
-> `Authorization: Bearer <seu_token>`
+------------------------------------------------------------------------
 
----
+# 📚 Rotas da API
 
-## Documentação da API
+## 👤 Usuários
 
-A documentação interativa está disponível via **Swagger**:
+-   POST /usuarios\
+-   POST /usuarios/login\
+-   GET /usuarios
 
-```
-http://localhost:3000/api-docs
-```
+## 🏷️ Categorias
 
-Lá você pode visualizar os **endpoints**, **exemplos de requisição** e **resposta**, além de poder testar diretamente.
+-   GET /categorias\
+-   POST /categorias\
+-   PUT /categorias/:id\
+-   DELETE /categorias/:id
 
-Felipe Barcelos
+## 🎫 Chamados
+
+-   GET /chamados\
+-   GET /chamados/:id\
+-   POST /chamados\
+-   PUT /chamados/:id\
+-   DELETE /chamados/:id
+
+------------------------------------------------------------------------
+
+# 📑 Validação com Ajv
+
+✔ Tipos corretos\
+✔ Campos obrigatórios\
+✔ Enums\
+✔ Sem campos extras
+
+------------------------------------------------------------------------
+
+# 📘 Documentação (Swagger)
+
+    http://localhost:3000/docs
+
+------------------------------------------------------------------------
+
+# ▶️ Instalação e Execução
+
+    npm install
+    npm run dev
+
+API em:
+
+    http://localhost:3000
+
+
+Desenvolvido por: Felipe Barcelos Rafaeli Falk
