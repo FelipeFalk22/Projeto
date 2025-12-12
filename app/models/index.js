@@ -1,9 +1,9 @@
 const conexao = require('./conexao.js');
 
 // Cada arquivo retorna diretamente o Model Sequelize
-const Usuario = require('./Usuario.js');
-const Categoria = require('./Categoria.js');
-const Chamado = require('./Chamado.js');
+const Usuario = require('./usuario.js');
+const Categoria = require('./categoria.js');
+const Chamado = require('./chamado.js');
 
 // Importa função de relações
 const relations = require('./relations.js');
